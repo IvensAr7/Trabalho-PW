@@ -15,15 +15,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Preencha todos os campos.");
     }
 
+    $foto_perfil = "default.png";
+
+    if (!empty($_POST["avatar_desenho"])) {
+
+        $base64 = preg_replace(
+            '#^data:image/\w+;base64,#i',
+            '',
+            $_POST["avatar_desenho"]
+        );
+
+        $dadosImagem = base64_decode($base64);
+
+        if ($dadosImagem !== false) {
+
+            $nomeArquivo =
+                "avatar_" . uniqid() . ".png";
+
+            $diretorio =
+                "../uploads/avatares/";
+
+            if (!is_dir($diretorio)) {
+                mkdir($diretorio, 0777, true);
+            }
+
+            $caminhoCompleto =
+                $diretorio . $nomeArquivo;
+
+            file_put_contents(
+                $caminhoCompleto,
+                $dadosImagem
+            );
+
+            $foto_perfil = $nomeArquivo;
+        }
+    }
+
     $sql = "INSERT INTO projetos
-            (titulo, descricao, id_user, data_entrega, data_criacao)
-            VALUES (?, ?, ?, ?, ?)";
+            (
+                titulo,
+                descricao,
+                foto_perfil,
+                id_user,
+                data_entrega,
+                data_criacao
+            )
+            VALUES (?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
 
     $stmt->execute([
         $titulo,
         $descricao,
+        $foto_perfil,
         $idUser,
         $dataEntrega,
         $dataCriacao

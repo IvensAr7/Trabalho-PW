@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  # Nosso serviço de PHP que criamos no Dockerfile
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+
+  # Nosso serviço de Banco de Dados MySQL
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: meu_banco
+      MYSQL_ROOT_PASSWORD: senha_secreta
+    ports:
+      - "3306:3306"

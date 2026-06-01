@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="../assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/4.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <script src="https://kit.fontawesome.com/9e914e4c6c.js" crossorigin="anonymous"></script>
 
     <style>
         * {

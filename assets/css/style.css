@@ -673,6 +673,155 @@ textarea {
     min-width: 150px;
 }
 
+/* ETAPA 2 */
+
+.avatar-step-title {
+    margin: 0 0 18px;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.avatar-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.avatar-choice label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+    background: #fff;
+    padding: 14px;
+    cursor: pointer;
+    transition:
+        border-color .15s ease,
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.avatar-choice label:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: var(--sh-xs);
+}
+
+.avatar-choice input[type="radio"] {
+    accent-color: var(--accent);
+}
+
+.avatar-editor {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.avatar-canvas-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+#avatarCanvas {
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 1;
+    border: 2px dashed rgba(37,99,235,.25);
+    border-radius: 20px;
+    background:
+        linear-gradient(
+            45deg,
+            #f8fafc 25%,
+            transparent 25%
+        ),
+        linear-gradient(
+            -45deg,
+            #f8fafc 25%,
+            transparent 25%
+        ),
+        linear-gradient(
+            45deg,
+            transparent 75%,
+            #f8fafc 75%
+        ),
+        linear-gradient(
+            -45deg,
+            transparent 75%,
+            #f8fafc 75%
+        );
+
+    background-size: 20px 20px;
+    background-position:
+        0 0,
+        0 10px,
+        10px -10px,
+        -10px 0;
+}
+
+.avatar-tools {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    margin-top: 16px;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+    background: rgba(255,255,255,.85);
+    box-shadow: var(--sh-xs);
+}
+
+#avatarCor {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    padding: 2px;
+    box-shadow: var(--sh-xs);
+}
+
+#avatarEspessura {
+    width: 120px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.avatar-tools .btn {
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-tools .btn i {
+    font-size: 1rem;
+}
+
+.avatar-tools i {
+    color: var(--ink-faint);
+    font-size: 1.1rem;
+}
+
+.avatar-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.avatar-actions .btn {
+    flex: 1;
+}
+
 
 /* ══════════════════════════════════════════════
    PERFIL

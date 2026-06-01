@@ -72,7 +72,7 @@ require_once "../includes/funcoes.php";
                 </a>
                 <a href="../crud_usuarios/perfil.php" class="btn-perfil">
                     <img
-                        src="<?= htmlspecialchars($_SESSION["usuario_foto"]); ?>"
+                        src="../uploads/avatares/<?= htmlspecialchars($_SESSION["usuario_foto"]); ?>"
                         alt="Foto de <?= htmlspecialchars($_SESSION["usuario_nome"]); ?>"
                         width="28" height="28"
                     >

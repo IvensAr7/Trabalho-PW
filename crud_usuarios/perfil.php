@@ -106,7 +106,7 @@ $status_cfg = [
                 <div class="washi"></div>
                 <div class="polaroid">
                     <img
-                        src="<?= htmlspecialchars($_SESSION['usuario_foto']) ?>"
+                        src="../uploads/avatares/<?= htmlspecialchars($_SESSION['usuario_foto']) ?>"
                         alt="Foto de <?= htmlspecialchars($_SESSION['usuario_nome']) ?>"
                         width="116" height="116"
                     >
