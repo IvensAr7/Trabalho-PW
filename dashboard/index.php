@@ -2,6 +2,7 @@
 
 require_once "../includes/verificar_login.php";
 require_once "../config/conexao.php";
+require_once "../includes/funcoes.php";
 
 $idUser = $_SESSION["usuario_id"];
 
@@ -34,13 +35,34 @@ $totalTarefas   = (int) array_sum(array_column($projetos, "total_tarefas"));
 $tarefasFeitas  = (int) array_sum(array_column($projetos, "tarefas_concluidas"));
 $projetosFeitos = count($colunas["Feito"]);
 
+$prazoResumo = [
+    'atrasados' => 0,
+    'hoje' => 0,
+    'proximos' => 0,
+];
+
+foreach ($projetos as $projeto) {
+    $prazo = analisarPrazoEntrega($projeto->data_entrega ?? null, $projeto->status ?? null);
+
+    if (empty($prazo)) {
+        continue;
+    }
+
+    if ($prazo['classe'] === 'deadline-overdue') {
+        $prazoResumo['atrasados']++;
+    } elseif ($prazo['classe'] === 'deadline-today') {
+        $prazoResumo['hoje']++;
+    } elseif (in_array($prazo['classe'], ['deadline-soon', 'deadline-upcoming'], true)) {
+        $prazoResumo['proximos']++;
+    }
+}
+
 function calcularProgressoDashboard(int $feitas, int $total): int {
     return $total > 0 ? (int) round(($feitas / $total) * 100) : 0;
 }
 
 $titulo = "Dashboard";
 require_once "../includes/header.php";
-require_once "../includes/funcoes.php";
 ?>
 
 <canvas id="mouse-trail"></canvas>
@@ -72,7 +94,7 @@ require_once "../includes/funcoes.php";
                 </a>
                 <a href="../crud_usuarios/perfil.php" class="btn-perfil">
                     <img
-                        src="../uploads/avatares/<?= htmlspecialchars($_SESSION["usuario_foto"]); ?>"
+                        src="<?= htmlspecialchars(avatarUsuarioUrl($_SESSION["usuario_foto"])); ?>"
                         alt="Foto de <?= htmlspecialchars($_SESSION["usuario_nome"]); ?>"
                         width="28" height="28"
                     >
@@ -97,6 +119,28 @@ require_once "../includes/funcoes.php";
             <div class="stat-stamp green">
                 <span class="stat-number"><?= $projetosFeitos; ?></span>
                 <span class="stat-label">feitos</span>
+            </div>
+        </section>
+
+        <section class="deadline-summary" aria-label="Resumo dos prazos">
+            <div class="deadline-summary__copy">
+                <strong>Prazos de entrega em destaque</strong>
+                <span>Acompanhe o que está atrasado, o que vence hoje e os próximos prazos importantes.</span>
+            </div>
+
+            <div class="deadline-summary__chips">
+                <span class="deadline-chip danger">
+                    <strong><?= $prazoResumo['atrasados']; ?></strong>
+                    atrasados
+                </span>
+                <span class="deadline-chip warning">
+                    <strong><?= $prazoResumo['hoje']; ?></strong>
+                    vencem hoje
+                </span>
+                <span class="deadline-chip info">
+                    <strong><?= $prazoResumo['proximos']; ?></strong>
+                    próximos
+                </span>
             </div>
         </section>
 

@@ -9,16 +9,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     validarCsrf();
 
-    $nome = trim($_POST["nome"]);
-    $email = trim($_POST["email"]);
-    $senha = trim($_POST["senha"]);
+    $nome = trim($_POST["nome"] ?? "");
+    $email = strtolower(trim($_POST["email"] ?? ""));
+    $senha = trim($_POST["senha"] ?? "");
+    $confirmarSenha = trim($_POST["confirmar_senha"] ?? "");
 
     // VALIDACOES
 
-    if (empty($nome) || empty($email) || empty($senha)) {
+    if (empty($nome) || empty($email) || empty($senha) || empty($confirmarSenha)) {
 
         redirecionarComFlash("login.php?tab=criar", "error", "Preencha todos os campos.");
 
+    }
+
+    $tamNome = function_exists("mb_strlen") ? mb_strlen($nome, "UTF-8") : strlen($nome);
+    $tamEmail = function_exists("mb_strlen") ? mb_strlen($email, "UTF-8") : strlen($email);
+
+    if ($tamNome > 100) {
+        redirecionarComFlash("login.php?tab=criar", "error", "O nome deve ter no maximo 100 caracteres.");
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -27,9 +35,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     }
 
-    if (strlen($senha) < 6) {
+    if ($tamEmail > 100) {
+        redirecionarComFlash("login.php?tab=criar", "error", "O email deve ter no maximo 100 caracteres.");
+    }
 
-        redirecionarComFlash("login.php?tab=criar", "error", "A senha deve ter no minimo 6 caracteres.");
+    if (strlen($senha) < 8) {
+
+        redirecionarComFlash("login.php?tab=criar", "error", "A senha deve ter no minimo 8 caracteres.");
+
+    }
+
+    if ($senha !== $confirmarSenha) {
+
+        redirecionarComFlash("login.php?tab=criar", "error", "A confirmacao de senha nao confere.");
 
     }
 
@@ -51,42 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-    $fotoPerfil = "default.png";
-
-    if (!empty($_POST["avatar_desenho"])) {
-
-        $base64 = preg_replace(
-            '#^data:image/\w+;base64,#i',
-            '',
-            $_POST["avatar_desenho"]
-        );
-
-        $dadosImagem = base64_decode($base64);
-
-        if ($dadosImagem !== false) {
-
-            $diretorio = "../uploads/avatares/";
-
-            if (!is_dir($diretorio)) {
-                mkdir($diretorio, 0777, true);
-            }
-
-            $nomeArquivo =
-                "avatar_" . uniqid() . ".png";
-
-            $caminho =
-                $diretorio . $nomeArquivo;
-
-            if (
-                file_put_contents(
-                    $caminho,
-                    $dadosImagem
-                ) !== false
-            ) {
-                $fotoPerfil = $nomeArquivo;
-            }
-        }
-    }
+    $fotoPerfil = salvarAvatarBase64($_POST["avatar_desenho"] ?? null) ?? "default.png";
 
     // INSERT
 

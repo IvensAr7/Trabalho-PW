@@ -34,6 +34,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         redirecionarComFlash("adicionar.php?id_projeto=" . urlencode((string) $idProjeto), "error", "Informe o titulo da tarefa.");
     }
 
+    $tamTitulo = function_exists("mb_strlen") ? mb_strlen($titulo, "UTF-8") : strlen($titulo);
+    $tamDescricao = function_exists("mb_strlen") ? mb_strlen($descricao, "UTF-8") : strlen($descricao);
+
+    if ($tamTitulo > 100) {
+        redirecionarComFlash("adicionar.php?id_projeto=" . urlencode((string) $idProjeto), "error", "O titulo da tarefa deve ter no maximo 100 caracteres.");
+    }
+
+    if ($tamDescricao > 1000) {
+        redirecionarComFlash("adicionar.php?id_projeto=" . urlencode((string) $idProjeto), "error", "A descricao deve ter no maximo 1000 caracteres.");
+    }
+
     if (!in_array($prioridade, ["Baixa", "Media", "Alta"]) || !in_array($status, ["A Fazer", "Fazendo", "Feito"])) {
         redirecionarComFlash("adicionar.php?id_projeto=" . urlencode((string) $idProjeto), "error", "Dados invalidos.");
     }
@@ -86,6 +97,9 @@ require_once "../includes/header.php";
                         name="titulo"
                         class="form-control"
                         placeholder="Ex: Definir escopo inicial"
+                        maxlength="100"
+                        minlength="3"
+                        autocomplete="off"
                         required
                     >
                 </div>
@@ -97,6 +111,7 @@ require_once "../includes/header.php";
                         name="descricao"
                         class="form-control"
                         placeholder="Detalhes da tarefa..."
+                        maxlength="1000"
                         rows="4"
                     ></textarea>
                 </div>

@@ -66,6 +66,142 @@ function redirecionarComFlash(string $url, string $tipo, string $mensagem): void
     exit;
 }
 
+function avatarUsuarioUrl(?string $fotoPerfil): string
+{
+    $fotoPerfil = trim((string) $fotoPerfil);
+
+    if ($fotoPerfil === '' || $fotoPerfil === 'default.png' || $fotoPerfil === '../assets/image/default.png') {
+        return '../assets/image/default.png';
+    }
+
+    if (preg_match('#^(?:https?:)?//#i', $fotoPerfil) || str_starts_with($fotoPerfil, '/')) {
+        return $fotoPerfil;
+    }
+
+    return '../uploads/avatares/' . ltrim($fotoPerfil, '/\\');
+}
+
+function salvarAvatarBase64(?string $dataUri, string $diretorioRelativo = '../uploads/avatares/', int $tamanhoMaximoBytes = 1048576): ?string
+{
+    $dataUri = trim((string) $dataUri);
+
+    if ($dataUri === '') {
+        return null;
+    }
+
+    if (!preg_match('#^data:image/(png|jpeg);base64,#i', $dataUri)) {
+        return null;
+    }
+
+    $base64 = substr($dataUri, strpos($dataUri, ',') + 1);
+    $dadosImagem = base64_decode($base64, true);
+
+    if ($dadosImagem === false || strlen($dadosImagem) > $tamanhoMaximoBytes) {
+        return null;
+    }
+
+    $infoImagem = @getimagesizefromstring($dadosImagem);
+    if ($infoImagem === false || empty($infoImagem['mime'])) {
+        return null;
+    }
+
+    $mime = strtolower((string) $infoImagem['mime']);
+    if (!in_array($mime, ['image/png', 'image/jpeg'], true)) {
+        return null;
+    }
+
+    $diretorio = rtrim($diretorioRelativo, "/\\") . DIRECTORY_SEPARATOR;
+
+    if (!is_dir($diretorio)) {
+        mkdir($diretorio, 0777, true);
+    }
+
+    $extensao = $mime === 'image/png' ? 'png' : 'jpg';
+    $nomeArquivo = 'avatar_' . bin2hex(random_bytes(8)) . '.' . $extensao;
+    $caminhoCompleto = $diretorio . $nomeArquivo;
+
+    if (file_put_contents($caminhoCompleto, $dadosImagem) === false) {
+        return null;
+    }
+
+    return $nomeArquivo;
+}
+
+function analisarPrazoEntrega(?string $dataEntrega, ?string $status = null): ?array
+{
+    $dataEntrega = trim((string) $dataEntrega);
+
+    if ($dataEntrega === '') {
+        return null;
+    }
+
+    $data = DateTimeImmutable::createFromFormat('!Y-m-d', $dataEntrega);
+    $erros = DateTimeImmutable::getLastErrors();
+
+    if (
+        $data === false
+        || ($erros !== false && (($erros['warning_count'] ?? 0) > 0 || ($erros['error_count'] ?? 0) > 0))
+    ) {
+        return null;
+    }
+
+    $hoje = new DateTimeImmutable('today');
+    $dias = (int) $hoje->diff($data)->format('%r%a');
+    $dataFormatada = $data->format('d/m/Y');
+
+    if (trim((string) $status) === 'Feito') {
+        return [
+            'classe' => 'deadline-done',
+            'rotulo' => 'Concluido',
+            'detalhe' => 'Entrega em ' . $dataFormatada,
+            'dias' => $dias,
+        ];
+    }
+
+    if ($dias < 0) {
+        return [
+            'classe' => 'deadline-overdue',
+            'rotulo' => 'Atrasado',
+            'detalhe' => 'Venceu ha ' . abs($dias) . ' dia' . (abs($dias) === 1 ? '' : 's'),
+            'dias' => $dias,
+        ];
+    }
+
+    if ($dias === 0) {
+        return [
+            'classe' => 'deadline-today',
+            'rotulo' => 'Entrega hoje',
+            'detalhe' => 'Vence hoje em ' . $dataFormatada,
+            'dias' => 0,
+        ];
+    }
+
+    if ($dias <= 3) {
+        return [
+            'classe' => 'deadline-soon',
+            'rotulo' => 'Prazo curto',
+            'detalhe' => 'Faltam ' . $dias . ' dia' . ($dias === 1 ? '' : 's'),
+            'dias' => $dias,
+        ];
+    }
+
+    if ($dias <= 7) {
+        return [
+            'classe' => 'deadline-upcoming',
+            'rotulo' => 'Prazo em breve',
+            'detalhe' => 'Faltam ' . $dias . ' dias',
+            'dias' => $dias,
+        ];
+    }
+
+    return [
+        'classe' => 'deadline-ok',
+        'rotulo' => 'No prazo',
+        'detalhe' => 'Faltam ' . $dias . ' dias',
+        'dias' => $dias,
+    ];
+}
+
 function atualizarStatusProjeto($pdo, $idProjeto, $idUser = null) {
 
     $sql = "SELECT status, COUNT(*) AS total
@@ -248,6 +384,7 @@ function render(array $items, string $tipo = 'projeto', int $idProjeto = 0): voi
                                     $total = (int) ($item->total_tarefas ?? 0);
                                     $feitas = (int) ($item->tarefas_concluidas ?? 0);
                                     $percentual = $total > 0 ? (int) round(($feitas / $total) * 100) : 0;
+                                    $prazo = analisarPrazoEntrega($item->data_entrega ?? null, $item->status ?? null);
                                 } else {
                                     $abrir = null;
                                     $editar = "../crud_tarefas/editar.php?id=" . $id;
@@ -287,6 +424,17 @@ function render(array $items, string $tipo = 'projeto', int $idProjeto = 0): voi
                                         </div>
                                         <span class="card-progress-label">
                                             <?= $feitas; ?> de <?= $total; ?> tarefas — <?= $percentual; ?>%
+                                        </span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($tipo === 'projeto'): ?>
+                                    <div class="deadline-pill <?= !empty($prazo) ? $esc($prazo['classe']) : 'deadline-muted'; ?>">
+                                        <span class="deadline-pill__label">
+                                            <?= !empty($prazo) ? $esc($prazo['rotulo']) : 'Sem prazo'; ?>
+                                        </span>
+                                        <span class="deadline-pill__detail">
+                                            <?= !empty($prazo) ? $esc($prazo['detalhe']) : 'Defina uma data de entrega'; ?>
                                         </span>
                                     </div>
                                 <?php endif; ?>

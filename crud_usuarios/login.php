@@ -81,6 +81,7 @@ require_once "../includes/header.php";
                             id="emailEntrar"
                             name="email"
                             class="login-input"
+                            maxlength="100"
                             autocomplete="username"
                             required
                         >
@@ -94,6 +95,7 @@ require_once "../includes/header.php";
                                 id="senha"
                                 name="senha"
                                 class="login-input"
+                                minlength="8"
                                 autocomplete="current-password"
                                 required
                             >
@@ -129,6 +131,7 @@ require_once "../includes/header.php";
                                 id="nomeCriar"
                                 name="nome"
                                 class="login-input"
+                                maxlength="100"
                                 autocomplete="name"
                                 required
                             >
@@ -141,6 +144,7 @@ require_once "../includes/header.php";
                                 id="emailCriar"
                                 name="email"
                                 class="login-input"
+                                maxlength="100"
                                 autocomplete="username"
                                 required
                             >
@@ -155,6 +159,7 @@ require_once "../includes/header.php";
                                     id="senhaCriar"
                                     name="senha"
                                     class="login-input"
+                                    minlength="8"
                                     autocomplete="new-password"
                                     required
                                 >
@@ -166,6 +171,22 @@ require_once "../includes/header.php";
                                 >
                                     <i class="fi fi-sr-eye-crossed"></i>
                                 </button>
+                            </div>
+                        </div>
+
+                        <div class="login-field">
+                            <label for="confirmarSenhaCriar" class="login-label">Confirmar senha</label>
+
+                            <div class="login-password-wrap">
+                                <input
+                                    type="password"
+                                    id="confirmarSenhaCriar"
+                                    name="confirmar_senha"
+                                    class="login-input"
+                                    minlength="8"
+                                    autocomplete="new-password"
+                                    required
+                                >
                             </div>
                         </div>
 
@@ -381,15 +402,25 @@ require_once "../includes/header.php";
         const nome = document.getElementById('nomeCriar');
         const email = document.getElementById('emailCriar');
         const senha = document.getElementById('senhaCriar');
+        const confirmarSenha = document.getElementById('confirmarSenhaCriar');
 
         if (
             !nome.checkValidity() ||
             !email.checkValidity() ||
-            !senha.checkValidity()
+            !senha.checkValidity() ||
+            !confirmarSenha.checkValidity()
         ) {
             nome.reportValidity();
             email.reportValidity();
             senha.reportValidity();
+            confirmarSenha.reportValidity();
+            return;
+        }
+
+        if (senha.value !== confirmarSenha.value) {
+            confirmarSenha.setCustomValidity('A confirmacao de senha nao confere.');
+            confirmarSenha.reportValidity();
+            confirmarSenha.setCustomValidity('');
             return;
         }
 

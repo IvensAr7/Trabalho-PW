@@ -31,9 +31,9 @@ CREATE TABLE `projetos` (
   `id_projeto` int(11) NOT NULL,
   `titulo` varchar(100) NOT NULL,
   `descricao` text DEFAULT NULL,
-  `status` enum('A Fazer','Fazendo','Feito','') NOT NULL DEFAULT 'A Fazer',
+  `status` enum('A Fazer','Fazendo','Feito') NOT NULL DEFAULT 'A Fazer',
   `data_entrega` date DEFAULT NULL,
-  `data_criacao` datetime NOT NULL,
+  `data_criacao` datetime NOT NULL DEFAULT current_timestamp(),
   `id_user` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -61,8 +61,8 @@ CREATE TABLE `tarefas` (
   `id_tarefa` int(11) NOT NULL,
   `titulo` varchar(100) NOT NULL,
   `descricao` text DEFAULT NULL,
-  `status` enum('A Fazer','Fazendo','Feito','') NOT NULL DEFAULT 'A Fazer',
-  `prioridade` enum('Baixa','Media','Alta','') NOT NULL DEFAULT 'Media',
+  `status` enum('A Fazer','Fazendo','Feito') NOT NULL DEFAULT 'A Fazer',
+  `prioridade` enum('Baixa','Media','Alta') NOT NULL DEFAULT 'Media',
   `data_criacao` datetime NOT NULL DEFAULT current_timestamp(),
   `id_projeto` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -78,7 +78,7 @@ CREATE TABLE `usuarios` (
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `senha` varchar(255) NOT NULL,
-  `foto_perfil` varchar(255) DEFAULT '../assets/image/default.png'
+  `foto_perfil` varchar(255) DEFAULT 'default.png'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -110,7 +110,8 @@ ALTER TABLE `tarefas`
 -- Índices de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id_user`);
+  ADD PRIMARY KEY (`id_user`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas

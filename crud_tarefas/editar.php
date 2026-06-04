@@ -53,6 +53,8 @@ require_once "../includes/header.php";
                         name="titulo"
                         class="form-control"
                         value="<?= htmlspecialchars($tarefa->titulo); ?>"
+                        maxlength="100"
+                        minlength="3"
                         required
                     >
                 </div>
@@ -64,6 +66,7 @@ require_once "../includes/header.php";
                         name="descricao"
                         class="form-control"
                         rows="4"
+                        maxlength="1000"
                     ><?= htmlspecialchars($tarefa->descricao); ?></textarea>
                 </div>
 

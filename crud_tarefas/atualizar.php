@@ -19,6 +19,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         redirecionarComFlash("../crud_projetos/projeto.php?id=" . urlencode((string) $idProjeto), "error", "Dados invalidos.");
     }
 
+    $tamTitulo = function_exists("mb_strlen") ? mb_strlen($titulo, "UTF-8") : strlen($titulo);
+    $tamDescricao = function_exists("mb_strlen") ? mb_strlen($descricao, "UTF-8") : strlen($descricao);
+
+    if ($tamTitulo > 100) {
+        redirecionarComFlash("../crud_projetos/projeto.php?id=" . urlencode((string) $idProjeto), "error", "O titulo da tarefa deve ter no maximo 100 caracteres.");
+    }
+
+    if ($tamDescricao > 1000) {
+        redirecionarComFlash("../crud_projetos/projeto.php?id=" . urlencode((string) $idProjeto), "error", "A descricao deve ter no maximo 1000 caracteres.");
+    }
+
     if (!in_array($prioridade, ["Baixa", "Media", "Alta"]) || !in_array($status, ["A Fazer", "Fazendo", "Feito"])) {
         redirecionarComFlash("../crud_projetos/projeto.php?id=" . urlencode((string) $idProjeto), "error", "Dados invalidos.");
     }

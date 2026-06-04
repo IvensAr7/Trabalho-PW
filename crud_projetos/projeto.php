@@ -61,6 +61,7 @@ $statusClasse = [
     "Feito" => "status-green",
 ];
 $classeStatus = $statusClasse[$projeto->status] ?? "status-amber";
+$prazoEntrega = analisarPrazoEntrega($projeto->data_entrega ?? null, $projeto->status ?? null);
 
 $titulo = "Projeto";
 require_once "../includes/header.php";
@@ -89,10 +90,25 @@ require_once "../includes/header.php";
                     <span class="project-meta__item">
                         <span class="project-meta__label">Entrega</span>
                         <span class="project-meta__value">
-                            <?= htmlspecialchars((new DateTime($projeto->data_entrega))->format('d/m/Y')); ?>
+                            <?php if (!empty($projeto->data_entrega)): ?>
+                                <?= htmlspecialchars((new DateTime($projeto->data_entrega))->format('d/m/Y')); ?>
+                            <?php else: ?>
+                                Sem data definida
+                            <?php endif; ?>
                         </span>
                     </span>
                 </div>
+
+                <?php if (!empty($prazoEntrega)): ?>
+                    <div class="project-deadline-banner <?= htmlspecialchars($prazoEntrega['classe']); ?>">
+                        <span class="project-deadline-banner__label">
+                            <?= htmlspecialchars($prazoEntrega['rotulo']); ?>
+                        </span>
+                        <span class="project-deadline-banner__detail">
+                            <?= htmlspecialchars($prazoEntrega['detalhe']); ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
             </header>
 
             <section class="project-section">

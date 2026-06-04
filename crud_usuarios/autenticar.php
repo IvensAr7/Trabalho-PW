@@ -9,8 +9,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     validarCsrf();
 
-    $email = trim($_POST["email"]);
-    $senha = trim($_POST["senha"]);
+    $email = strtolower(trim($_POST["email"] ?? ""));
+    $senha = trim($_POST["senha"] ?? "");
 
     if (empty($email) || empty($senha)) {
 
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["usuario_id"] = $usuario->id_user;
             $_SESSION["usuario_nome"] = $usuario->nome;
             $_SESSION["usuario_email"] = $usuario->email;
-            $_SESSION["usuario_foto"] = $usuario->foto_perfil;
+            $_SESSION["usuario_foto"] = $usuario->foto_perfil ?? "default.png";
 
             header("Location: ../dashboard/index.php");
 

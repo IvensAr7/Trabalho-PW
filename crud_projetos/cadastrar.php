@@ -17,38 +17,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         redirecionarComFlash("cadastro.php", "error", "Preencha todos os campos.");
     }
 
-    $foto_perfil = "default.png";
+    $tamTitulo = function_exists("mb_strlen") ? mb_strlen($titulo, "UTF-8") : strlen($titulo);
+    $tamDescricao = function_exists("mb_strlen") ? mb_strlen($descricao, "UTF-8") : strlen($descricao);
 
-    if (!empty($_POST["avatar_desenho"])) {
+    if ($tamTitulo > 100) {
+        redirecionarComFlash("cadastro.php", "error", "O titulo do projeto deve ter no maximo 100 caracteres.");
+    }
 
-        $base64 = preg_replace(
-            '#^data:image/\w+;base64,#i',
-            '',
-            $_POST["avatar_desenho"]
-        );
+    if ($tamDescricao > 1000) {
+        redirecionarComFlash("cadastro.php", "error", "A descricao deve ter no maximo 1000 caracteres.");
+    }
 
-        $dadosImagem = base64_decode($base64);
+    $dataValida = DateTimeImmutable::createFromFormat('!Y-m-d', $dataEntrega);
+    $errosData = DateTimeImmutable::getLastErrors();
 
-        if ($dadosImagem !== false) {
+    if ($dataValida === false || ($errosData !== false && (($errosData['warning_count'] ?? 0) > 0 || ($errosData['error_count'] ?? 0) > 0))) {
+        redirecionarComFlash("cadastro.php", "error", "Data de entrega invalida.");
+    }
 
-            $nomeArquivo =
-                "avatar_" . uniqid() . ".png";
-
-            $diretorio =
-                "../uploads/avatares/";
-
-            if (!is_dir($diretorio)) {
-                mkdir($diretorio, 0777, true);
-            }
-
-            $caminhoCompleto =
-                $diretorio . $nomeArquivo;
-
-            file_put_contents(
-                $caminhoCompleto,
-                $dadosImagem
-            );
-        }
+    $hoje = new DateTimeImmutable('today');
+    if ($dataValida < $hoje) {
+        redirecionarComFlash("cadastro.php", "error", "A data de entrega nao pode ser anterior a hoje.");
     }
 
     $sql = "INSERT INTO projetos

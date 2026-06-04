@@ -36,7 +36,7 @@ require_once "../includes/header.php";
         <div class="form-inner">
             <header class="form-header">
                 <h1 class="form-title">Editar Projeto</h1>
-                <p class="form-subtitle">Atualize a pagina do projeto sem perder o fluxo.</p>
+                <p class="form-subtitle">Atualize a página do projeto sem perder o fluxo.</p>
             </header>
 
             <form action="atualizar.php" method="POST">
@@ -44,24 +44,27 @@ require_once "../includes/header.php";
                 <input type="hidden" name="id" value="<?= htmlspecialchars($projeto->id_projeto); ?>">
 
                 <div class="form-group">
-                    <label for="titulo" class="form-label">Titulo do projeto</label>
+                    <label for="titulo" class="form-label">Título do projeto</label>
                     <input
                         type="text"
                         id="titulo"
                         name="titulo"
                         class="form-control"
                         value="<?= htmlspecialchars($projeto->titulo); ?>"
+                        maxlength="100"
+                        minlength="3"
                         required
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="descricao" class="form-label">Descricao</label>
+                    <label for="descricao" class="form-label">Descrição</label>
                     <textarea
                         id="descricao"
                         name="descricao"
                         class="form-control"
                         rows="4"
+                        maxlength="1000"
                     ><?= htmlspecialchars($projeto->descricao); ?></textarea>
                 </div>
 
